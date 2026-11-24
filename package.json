@@ -1,0 +1,8 @@
+{
+  "name": "frame2d-studio",
+  "version": "1.0.0",
+  "description": "Matrix structural analysis of plane frames and trusses in the browser (CE 7405, LSU)",
+  "scripts": { "test": "node tests/run_tests.js && node tests/feature_tests.js && node tests/v3_tests.js && node tests/advanced_tests.js", "report": "node tests/report.js" },
+  "license": "UNLICENSED",
+  "private": true
+}

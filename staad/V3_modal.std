@@ -1,0 +1,75 @@
+STAAD PLANE
+* V3. Cantilever column, natural frequencies
+* Exported by Frame2D Studio. Units kN, m. Sections are prismatic (AX, IZ): no shear deformation.
+* Load case 1 = all loads (constant + variable at load factor 1).
+START JOB INFORMATION
+ENGINEER DATE 2026-11-24
+END JOB INFORMATION
+INPUT WIDTH 79
+UNIT METER KN
+JOINT COORDINATES
+1 0 0 0;
+2 0 0.2 0;
+3 0 0.4 0;
+4 0 0.6 0;
+5 0 0.8 0;
+6 0 1 0;
+7 0 1.2 0;
+8 0 1.4 0;
+9 0 1.6 0;
+10 0 1.8 0;
+11 0 2 0;
+12 0 2.2 0;
+13 0 2.4 0;
+14 0 2.6 0;
+15 0 2.8 0;
+16 0 3 0;
+17 0 3.2 0;
+18 0 3.4 0;
+19 0 3.6 0;
+20 0 3.8 0;
+21 0 4 0;
+MEMBER INCIDENCES
+1 1 2;
+2 2 3;
+3 3 4;
+4 4 5;
+5 5 6;
+6 6 7;
+7 7 8;
+8 8 9;
+9 9 10;
+10 10 11;
+11 11 12;
+12 12 13;
+13 13 14;
+14 14 15;
+15 15 16;
+16 16 17;
+17 17 18;
+18 18 19;
+19 19 20;
+20 20 21;
+DEFINE MATERIAL START
+ISOTROPIC MAT1
+E 2.000000E8
+POISSON 0.3
+DENSITY 76.982202
+ALPHA 1.2E-5
+END DEFINE MATERIAL
+MEMBER PROPERTY
+1 TO 20 PRIS AX 0.01709674 IZ 0.00041581519
+CONSTANTS
+MATERIAL MAT1 MEMB 1 TO 20
+SUPPORTS
+1 FIXED
+CUT OFF MODE SHAPE 6
+* Masses: self-weight (density x area) converted to mass in X and Y. STAAD lumps masses at the joints;
+* compare with Frame2D's lumped-mass option. Frequencies appear under CALCULATED FREQUENCIES.
+LOAD 1 LOADTYPE None TITLE MASSES
+SELFWEIGHT X 1
+SELFWEIGHT Y 1
+MODAL CALCULATION REQUESTED
+PERFORM ANALYSIS
+PRINT JOINT DISPLACEMENTS ALL
+FINISH

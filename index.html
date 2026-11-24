@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frame2D Studio</title>
+<meta name="description" content="Matrix structural analysis of plane frames and trusses in the browser: direct stiffness method, second-order analysis, buckling and plastic collapse.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231F5FBF'/%3E%3Cpath d='M7 26V9h18v17' fill='none' stroke='white' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand" id="brand" role="button" tabindex="0" title="Home">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="6" fill="currentColor"/><path d="M7 26V9h18v17" fill="none" stroke="#fff" stroke-width="3"/><path d="M4 26h8M20 26h8" stroke="#fff" stroke-width="2"/></svg>
+    <div><strong>Frame2D Studio</strong><span>Matrix analysis of plane frames and trusses</span></div>
+  </div>
+  <nav class="filebar">
+    <label class="select-wrap">Example
+      <select id="exampleSelect"></select>
+    </label>
+    <button id="btnNew" class="ghost" title="New model from a template">New</button>
+    <button id="btnOpen" class="ghost">Open</button>
+    <button id="btnSave" class="ghost">Save</button>
+    <div class="menu">
+      <button id="btnExport" class="ghost" aria-haspopup="true">Export</button>
+      <div class="menu-list" id="exportMenu" hidden>
+        <button data-export="staad">STAAD.Pro input (.std)</button>
+        <button data-export="csv">Results table (.csv)</button>
+        <button data-export="xlsx">Excel workbook (.xlsx)</button>
+        <button data-export="dxf">CAD drawing (.dxf)</button>
+        <button data-export="png">Drawing (.png)</button>
+        <button data-export="svg">Drawing (.svg)</button>
+      </div>
+    </div>
+    <span class="bar-sep"></span>
+    <button id="btnValidation" class="outline">Validation</button>
+    <button id="btnSheet" class="outline">Hand calculations</button>
+    <button id="btnShare" class="outline" title="Share link and QR code">Share</button>
+    <button id="btnPresent" class="outline" title="Guided demo for the presentation">Present</button>
+    <span class="bar-sep"></span>
+    <button id="btnUndo" class="ghost icon" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
+    <button id="btnRedo" class="ghost icon" title="Redo (Ctrl+Y)" aria-label="Redo">↷</button>
+    <button id="btnHelp" class="ghost icon" title="Guide" aria-label="Guide">?</button>
+  </nav>
+  <input type="file" id="fileInput" accept=".json,application/json" hidden>
+</header>
+
+<main class="layout">
+  <!-- Model editor -->
+  <aside class="panel left" aria-label="Model">
+    <div class="model-head">
+      <input id="modelTitle" class="title-input" aria-label="Model title">
+      <p id="modelDesc" class="desc"></p>
+    </div>
+    <div class="tabs" role="tablist" id="leftTabs">
+      <button role="tab" data-tab="nodes" class="on">Nodes</button>
+      <button role="tab" data-tab="members">Members</button>
+      <button role="tab" data-tab="sections">Sections</button>
+      <button role="tab" data-tab="supports">Supports</button>
+      <button role="tab" data-tab="loads">Loads</button>
+    </div>
+    <div class="tab-body" id="leftBody"></div>
+    <div class="model-status" id="modelStatus"></div>
+  </aside>
+
+  <!-- Drawing -->
+  <section class="stage" aria-label="Drawing">
+    <div class="toolbar tools" role="toolbar" aria-label="Drawing tools">
+      <button data-tool="select" data-icon="select" class="on" title="Select and move (V)"><svg viewBox="0 0 16 16"><path d="M3 2l9 6-4 1 2 4-2 1-2-4-3 3z"/></svg>Select</button>
+      <button data-tool="node" data-icon="node" title="Add nodes (N)"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3.2" fill="none" stroke-width="1.8"/><path d="M8 1v3M8 12v3M1 8h3M12 8h3" fill="none" stroke-width="1.2"/></svg>Node</button>
+      <button data-tool="member" data-icon="member" title="Draw members node to node (M)"><svg viewBox="0 0 16 16"><circle cx="3" cy="13" r="2"/><circle cx="13" cy="3" r="2"/><path d="M4 12L12 4" fill="none" stroke-width="2"/></svg>Member</button>
+      <button data-tool="support" data-icon="support" title="Click a node to cycle its support (S)"><svg viewBox="0 0 16 16"><path d="M8 3L3 11h10z" fill="none" stroke-width="1.6"/><path d="M2 14h12" fill="none" stroke-width="1.6"/></svg>Support</button>
+      <button data-tool="load" data-icon="load" title="Click a node or member to add a load (L)"><svg viewBox="0 0 16 16"><path d="M8 1v10" fill="none" stroke-width="1.8"/><path d="M4 8l4 5 4-5z"/><path d="M2 15h12" fill="none" stroke-width="1.4"/></svg>Load</button>
+      <span class="sep"></span>
+      <button id="btnFit" title="Fit to view (F)">Fit</button>
+      <label class="snap">Grid (m) <input id="gridSize" type="number" step="0.25" min="0.05" value="1"></label>
+    </div>
+    <div class="toolbar views" role="toolbar" aria-label="Result views">
+      <button data-view="model" class="on">Model</button>
+      <button data-view="deformed">Deformed</button>
+      <button data-view="N">Axial</button>
+      <button data-view="V">Shear</button>
+      <button data-view="M">Moment</button>
+      <button data-view="U" title="Demand / plastic capacity">Utilization</button>
+      <button data-view="mode">Mode</button>
+    </div>
+    <div class="viewopts">
+      <label><input type="checkbox" id="optValues" checked> Values</label>
+      <label><input type="checkbox" id="optLabels" checked> Numbers</label>
+      <label title="Animate deformed shapes and mode shapes"><input type="checkbox" id="optAnimate" checked> Animate</label>
+      <label class="scale">Scale <input type="range" id="optScale" min="-2" max="2" step="0.05" value="0"></label>
+    </div>
+    <svg id="canvas" tabindex="0" aria-label="Structure drawing"></svg>
+    <div class="legend" id="legend"></div>
+    <div class="stepbar" id="stepbar" hidden>
+      <button id="btnPlay" class="icon" aria-label="Play">▶</button>
+      <input type="range" id="stepSlider" min="0" max="0" value="0" aria-label="Load step">
+      <span id="stepLabel"></span>
+    </div>
+    <div class="statusbar"><span id="hint"></span><span id="coords"></span></div>
+  </section>
+
+  <!-- Analysis and results -->
+  <aside class="panel right" aria-label="Analysis">
+    <div class="analysis">
+      <label class="field wide">Analysis
+        <select id="analysisType">
+          <option value="linear">Linear static (first order)</option>
+          <option value="second">Second order (P-Δ, Newton–Raphson)</option>
+          <option value="buckling">Elastic buckling (eigenvalue)</option>
+          <option value="pushover">Plastic collapse (hinge by hinge)</option>
+          <option value="arc">Snap-through (arc length)</option>
+          <option value="modal">Natural frequencies (modal)</option>
+          <option value="moving">Moving load (vehicle crossing)</option>
+          <option value="il">Influence line</option>
+          <option value="combo">Load combinations and member checks</option>
+          <option value="th">Earthquake time history</option>
+        </select>
+      </label>
+      <p class="analysis-note" id="analysisNote"></p>
+      <div class="opts" id="analysisOpts"></div>
+      <div class="runrow">
+        <button id="btnRun" class="primary">Run analysis</button>
+        <label class="live"><input type="checkbox" id="optLive" checked> Update linear results while editing</label>
+      </div>
+      <div class="runmsg" id="runMsg" role="status"></div>
+    </div>
+    <div class="tabs" role="tablist" id="rightTabs">
+      <button role="tab" data-tab="results" class="on">Results</button>
+      <button role="tab" data-tab="method">Method</button>
+      <button role="tab" data-tab="checks">Checks</button>
+      <button role="tab" data-tab="damage">Damage</button>
+    </div>
+    <div class="tab-body" id="rightBody"></div>
+  </aside>
+</main>
+
+<div id="welcome" class="overlay" hidden></div>
+<div id="sheet" class="overlay" hidden></div>
+<div id="valcenter" class="overlay" hidden></div>
+<dialog id="dlg"><form method="dialog" id="dlgForm"></form></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="vendor/katex/katex.min.js"></script>
+<script src="js/linalg.js"></script>
+<script src="js/solver.js"></script>
+<script src="js/dynamics.js"></script>
+<script src="js/advanced.js"></script>
+<script src="js/examples.js"></script>
+<script src="js/staad.js"></script>
+<script src="js/ui-common.js"></script>
+<script src="js/ui-canvas.js"></script>
+<script src="js/ui-model.js"></script>
+<script src="js/ui-results.js"></script>
+<script src="js/ui-advanced.js"></script>
+<script src="vendor/qrcode/qrcode.js"></script>
+<script src="js/share.js"></script>
+<script src="js/present.js"></script>
+<script src="js/calcsheet.js"></script>
+<script src="js/validation.js"></script>
+<script src="js/welcome.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
