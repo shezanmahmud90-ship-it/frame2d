@@ -12,7 +12,8 @@ commercial program. Frame2D Studio carries these three cases as **V1, V2 and V3*
 
 ## Workflow
 
-1. In the Validation Center choose a case and press **Download STAAD.Pro input**. The `.std` file uses
+1. The ready-made input files are in the [staad/](../staad/) folder. Or, in the Validation Center, choose a case
+   and press **Download STAAD.Pro input**. The `.std` file uses
    `STAAD PLANE`, units kN and m, prismatic sections (`AX`, `IZ`, so no shear deformation, the same as
    Frame2D's Euler–Bernoulli elements) and the analysis command for that case:
    - V1: `PERFORM ANALYSIS`
@@ -25,11 +26,31 @@ commercial program. Frame2D Studio carries these three cases as **V1, V2 and V3*
 
 ## Where to read STAAD's numbers
 
-- Displacements: *Joint Displacements* (STAAD reports in the units set, here m; the app shows mm).
+- Displacements: *Joint Displacements*. STAAD prints them in cm even with `UNIT METER KN`; multiply by 10 for the app's mm.
 - Reactions: *Support Reactions*. STAAD gives the force the support exerts on the structure, the same sign
   convention as Frame2D.
 - Member end moments: *Member End Forces*, MZ at the start/end joint, in member local axes.
 - Frequencies: *Calculated Frequencies for Load Case 1*.
+
+## Results so far
+
+V1 was run in STAAD.Pro on 2026-11-24. All ten compared quantities agree, with a largest difference of
+0.16 % (the vertical displacement of node 5, which STAAD prints to 0.001 cm):
+
+| Quantity | Frame2D | STAAD.Pro |
+|---|---:|---:|
+| Roof drift, node 5 (mm) | 8.1428 | 8.14282 |
+| Level 1 drift, node 3 (mm) | 3.5737 | 3.574 |
+| Vertical displacement, node 5 (mm) | −0.2157 | −0.216 |
+| Base shear, node 1 (kN) | −25.313 | −25.31 |
+| Vertical reaction, node 1 (kN) | 137.930 | 137.93 |
+| Base moment, node 1 (kN·m) | 78.054 | 78.05 |
+| Base moment, node 2 (kN·m) | 107.027 | 107.03 |
+| Roof beam end moment, node 5 (kN·m) | 22.911 | 22.91 |
+| Σ base shear (kN) | −75.00 | −75.00 |
+| Σ vertical reactions (kN) | 360.00 | 360.00 |
+
+V2 and V3: to be added.
 
 ## Expected differences
 
