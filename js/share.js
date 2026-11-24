@@ -37,7 +37,7 @@
   };
   const baseURL = () => {
     if (/^https?:/.test(location.protocol)) return location.origin + location.pathname;
-    try { return localStorage.getItem("f2d-base") || "https://YOUR-USERNAME.github.io/frame2d-studio/"; } catch (e) { return "https://YOUR-USERNAME.github.io/frame2d-studio/"; }
+    try { return localStorage.getItem("f2d-base") || "https://shezanmahmud90-ship-it.github.io/frame2d/"; } catch (e) { return "https://shezanmahmud90-ship-it.github.io/frame2d/"; }
   };
   App.qrSVG = function (text, size) {
     const qr = window.qrcode(0, "L"); qr.addData(text); qr.make();
