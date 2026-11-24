@@ -4,7 +4,7 @@ Matrix structural analysis of plane frames and trusses that runs in the browser.
 (Statically Indeterminate Structures, LSU, Fall 2026) following McGuire, Gallagher and Ziemian,
 *Matrix Structural Analysis*, 2nd ed. (2000).
 
-**Live app:** `https://<your-github-username>.github.io/frame2d-studio/` (after you enable GitHub Pages, see below)
+**Live app:** `https://<shezanmahmud90-ship-it>.github.io/frame2d-studio/` (after you enable GitHub Pages, see below)
 
 Nothing to install: open the link, pick an example or draw a structure, and the results update as you edit.
 
